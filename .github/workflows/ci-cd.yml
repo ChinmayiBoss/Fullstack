@@ -27,11 +27,9 @@ jobs:
           curl -sS https://getcomposer.org/installer | php
           sudo mv composer.phar /usr/local/bin/composer
           composer --version
-
-      - name: Install PHP dependencies
-        run: |
           cd Fullstack/backend  # or just cd . if composer.json is in root
           composer install --no-interaction --prefer-dist --optimize-autoloader
+          docker-compose up -d --build
           
       - name: Deploy to server
         uses: appleboy/ssh-action@v0.1.6

@@ -22,11 +22,16 @@ jobs:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASS }}
 
-      - name: Install docker-compose
+      - name: Install Composer
         run: |
-          sudo curl -L "https://github.com/docker/compose/releases/download/v2.22.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
-          docker-compose --version
+          curl -sS https://getcomposer.org/installer | php -- \
+          --install-dir=/usr/local/bin \
+          --filename=composer --version=1.10.16
+          composer global require --optimize-autoloader \
+          "fxp/composer-asset-plugin:~1.4.6" \
+          "hirak/prestissimo:^0.3.10"
+          composer global dumpautoload --optimize
+          composer clear-cache
 
       - name: Deploy to server
         uses: appleboy/ssh-action@v0.1.6

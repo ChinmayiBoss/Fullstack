@@ -22,16 +22,16 @@ jobs:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASS }}
 
-      - name: Install Composer
+      - name: Install Composer 2
         run: |
-          curl -sS https://getcomposer.org/installer | php -- \
-          --install-dir=/usr/local/bin \
-          --filename=composer --version=1.10.16
-          composer global require --optimize-autoloader \
-          "fxp/composer-asset-plugin:~1.4.6" \
-          "hirak/prestissimo:^0.3.10"
-          composer global dumpautoload --optimize
-          composer clear-cache
+          curl -sS https://getcomposer.org/installer | php
+          sudo mv composer.phar /usr/local/bin/composer
+          composer --version
+
+      - name: Install PHP dependencies
+        run: |
+         cd backend  # change to your backend folder
+         composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Deploy to server
         uses: appleboy/ssh-action@v0.1.6

@@ -30,9 +30,9 @@ jobs:
 
       - name: Install PHP dependencies
         run: |
-         cd backend  # change to your backend folder
-         composer install --no-interaction --prefer-dist --optimize-autoloader
-
+          cd Fullstack/backend  # or just cd . if composer.json is in root
+          composer install --no-interaction --prefer-dist --optimize-autoloader
+          
       - name: Deploy to server
         uses: appleboy/ssh-action@v0.1.6
         with:

@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        
+      
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -22,15 +22,16 @@ jobs:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASS }}
 
-      - name: Install Composer 2
+      - name: Install Composer & dependencies
         run: |
-          curl -sS https://getcomposer.org/installer | php
-          sudo mv composer.phar /usr/local/bin/composer
-          composer --version
-          cd Fullstack/backend  # or just cd . if composer.json is in root
-          composer install --no-interaction --prefer-dist --optimize-autoloader
-          docker-compose up -d --build
-          
+          sudo mkdir -p /etc/apt/keyrings
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+          echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \
+  | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          sudo apt update
+          sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+
       - name: Deploy to server
         uses: appleboy/ssh-action@v0.1.6
         with:
@@ -39,5 +40,5 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           script: |
             cd /home/ubuntu/Fullstack
-            docker-compose down
-            docker-compose up -d --build
+            docker compose down
+            docker compose up -d --build

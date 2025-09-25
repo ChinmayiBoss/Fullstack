@@ -1,5 +1,8 @@
 FROM php:8.2-apache
 
+# Set working directory first
+WORKDIR /var/www/html/
+
 # Install dependencies for building MongoDB PHP extension
 RUN apt-get update && apt-get install -y \
     libssl-dev \
@@ -15,19 +18,24 @@ RUN apt-get update && apt-get install -y \
     libc-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install MongoDB extension
+# Install MongoDB PHP extension
 RUN pecl install mongodb \
     && docker-php-ext-enable mongodb
 
 # Enable Apache rewrite
 RUN a2enmod rewrite
 
-# Copy project files
-COPY . /var/www/html/
-WORKDIR /var/www/html/
+# Install Composer directly (no multi-stage needed)
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Install Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Copy project files
+COPY . .
 
 # Install PHP dependencies
 RUN composer install --ignore-platform-req=ext-mongodb
+
+# Expose Apache port
+EXPOSE 80
+
+# Default command
+CMD ["apache2-foreground"]

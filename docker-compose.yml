@@ -5,21 +5,19 @@ services:
     build:
       context: ./backend
       dockerfile: backend.dockerfile
+    image: mydockeruser/fullstack-backend:latest
     ports:
       - "8000:80"
     depends_on:
       - mongo
-    volumes:
-      - ./backend:/var/www/html
 
   frontend:
     build:
       context: ./frontend
       dockerfile: frontend.dockerfile
+    image: mydockeruser/fullstack-frontend:latest
     ports:
       - "3000:3000"
-    volumes:
-      - ./frontend:/usr/src/app
     stdin_open: true
     tty: true
 

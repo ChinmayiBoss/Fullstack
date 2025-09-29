@@ -8,13 +8,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
 
     steps:
-      # 1. Checkout repo
+      # 1. Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -32,26 +28,19 @@ jobs:
       # 4. Build & push frontend image
       - name: Build & push frontend image
         run: |
-          docker build \
-            --file frontend.dockerfile \
-            --tag mydockeruser/fullstack-frontend:latest \
-            ./frontend
+          docker build -f frontend.dockerfile -t mydockeruser/fullstack-frontend:latest .
           docker push mydockeruser/fullstack-frontend:latest
 
       # 5. Build & push backend image
       - name: Build & push backend image
         run: |
-          docker build \
-            --file backend.dockerfile \
-            --tag mydockeruser/fullstack-backend:latest \
-            ./backend
+          docker build -f backend.dockerfile -t mydockeruser/fullstack-backend:latest .
           docker push mydockeruser/fullstack-backend:latest
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      # 1. Deploy via SSH
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:

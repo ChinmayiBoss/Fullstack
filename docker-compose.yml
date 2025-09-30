@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: backend.dockerfile
-    image: mydockeruser/fullstack-backend:latest
+    image: chinuboss/docker:back
     ports:
       - "8000:80"
     depends_on:
@@ -15,7 +15,7 @@ services:
     build:
       context: .
       dockerfile: frontend.dockerfile
-    image: mydockeruser/fullstack-frontend:latest
+    image: chinuboss/docker:front
     ports:
       - "3000:3000"
     stdin_open: true

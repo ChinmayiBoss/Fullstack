@@ -1,9 +1,12 @@
 FROM nginx:alpine
 
-WORKDIR /usr/share/nginx/html
+# Remove default NGINX content
+RUN rm -rf /usr/share/nginx/html/*
 
-COPY index.html index.js ./
+# Copy your frontend files
+COPY index.html index.js /usr/share/nginx/html/
 
-EXPOSE 3000
+# NGINX serves on port 80 by default
+EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]

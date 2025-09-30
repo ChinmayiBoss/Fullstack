@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,17 +25,18 @@ jobs:
 
       - name: Build & push frontend image
         run: |
-          docker build -f frontend.dockerfile -t mydockeruser/fullstack-frontend:latest .
-          docker push mydockeruser/fullstack-frontend:latest
+          docker build -f frontend.dockerfile -t chinuboss/frontend-app:latest .
+          docker push chinuboss/frontend-app:latest
 
       - name: Build & push backend image
         run: |
-          docker build -f backend.dockerfile -t mydockeruser/fullstack-backend:latest .
-          docker push mydockeruser/fullstack-backend:latest
+          docker build -f backend.dockerfile -t chinuboss/backend-app:latest .
+          docker push chinuboss/backend-app:latest
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
+
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
@@ -42,6 +45,24 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            cd /path/to/project
-            docker-compose pull
-            docker-compose up -d --remove-orphans
+            echo "Stopping old containers..."
+            docker stop frontend-app || true
+            docker rm frontend-app || true
+            docker stop backend-app || true
+            docker rm backend-app || true
+
+            echo "Pulling latest images..."
+            docker pull chinuboss/frontend-app:latest
+            docker pull chinuboss/backend-app:latest
+
+            echo "Running backend container..."
+            docker run -d \
+              --name backend-app \
+              -p 8080:80 \
+              chinuboss/backend-app:latest
+
+            echo "Running frontend container..."
+            docker run -d \
+              --name frontend-app \
+              -p 80:80 \
+              chinuboss/frontend-app:latest
